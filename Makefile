@@ -1,2 +1,2 @@
-mqtt-to-sms: mqtt-to-sms.cpp
-	$(CXX) mqtt-to-sms.cpp -o mqtt-to-sms -lmosquitto
+mqtt-to-email: mqtt-to-email.cpp
+	$(CXX) mqtt-to-email.cpp -o mqtt-to-email -lmosquitto
