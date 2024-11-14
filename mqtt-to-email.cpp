@@ -42,7 +42,7 @@ on_subscribe(struct mosquitto *mosq, void *obj, int mid, int qos_count, const in
     }
 }
 
-#define EMAIL "4127283821@tmomail.net"
+#define EMAIL "crpalmer@gmail.com"
 
 void
 on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg) {
