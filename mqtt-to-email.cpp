@@ -4,6 +4,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#define TOPIC_PREFIX "alerts/"
+#define EMAIL "crpalmer@gmail.com"
+
 void
 on_connect(struct mosquitto *mosq, void *obj, int reason_code) {
     int rc;
@@ -15,7 +18,7 @@ on_connect(struct mosquitto *mosq, void *obj, int reason_code) {
 	return;
     }
 
-    rc = mosquitto_subscribe(mosq, NULL, "alerts", 1);
+    rc = mosquitto_subscribe(mosq, NULL, TOPIC_PREFIX "#", 1);
     if (rc != MOSQ_ERR_SUCCESS) {
 	fprintf(stderr, "Error subscribing: %s\n", mosquitto_strerror(rc));
 	exit(1);
@@ -42,8 +45,6 @@ on_subscribe(struct mosquitto *mosq, void *obj, int mid, int qos_count, const in
     }
 }
 
-#define EMAIL "crpalmer@gmail.com"
-
 void
 on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg) {
     //FILE *pipe = popen("cat", "w");
@@ -52,7 +53,11 @@ on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *ms
 	perror("popen");
 	exit(1);
     }
-    fprintf(pipe, "To: " EMAIL "\nFrom: crpalmer@gmail.com\nSubject: MQTT Alert\n\n%s", (char *) msg->payload);
+
+    const char *channel = msg->topic;
+    if (strlen(channel) >= strlen(TOPIC_PREFIX)) channel += strlen(TOPIC_PREFIX);
+
+    fprintf(pipe, "To: " EMAIL "\nFrom: crpalmer@gmail.com\nSubject: MQTT Alert (%s)\n\n%s", channel, (char *) msg->payload);
     fclose(pipe);
     printf("sent alert: %s\n", (char *) msg->payload);
 }
