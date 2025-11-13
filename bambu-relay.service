@@ -1,0 +1,11 @@
+[Unit]
+Description=Bambu Email Relay for Alerts
+After=network.targert
+
+[Service]
+ExecStart=/usr/local/bin/bambu-relay.service.sh
+Type=exec
+
+[Install]
+WantedBy=multi-user.target
+
