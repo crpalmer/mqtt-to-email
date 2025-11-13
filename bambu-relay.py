@@ -4,6 +4,43 @@ import json
 import paho.mqtt.client as mqtt
 import time
 
+ignored_errors = [
+    "0",            # no error
+    "0300-400C",     # print was cancelled
+    "0500-400E",     # print was cancelled
+]
+
+class ErrorString:
+    def __init__(this, errors, string):
+        this.errors = errors
+        this.string = string
+
+    def matches(this, error):
+        return error in this.errors
+
+error_strings = [
+    # Unknown errors that I've hit:
+    ErrorString([ "0500-808C" ], "Could not identify build plate or invalid build plate was specified."),
+
+    # From the Bambu Error List
+    ErrorString([ "0300-800A" ], "A Filament pile-up was detected by the AI Print Monitoring. Please clean the filament from the waste chute."),
+    ErrorString([ "0300-8003" ], "Spaghetti defects were detected by the AI Print Monitoring. Please check the quality of the printed model before continuing your print."),
+    ErrorString([ "0700-8010", "0701-8010" ], "The AMS assist motor is overloaded. This could be due to entangled filament or a stuck spool."),
+    ErrorString([ "07FF-8010", "0702-8010", "0703-8010"], "AMS assist motor is overloaded. Please check if the spool or filament is stuck. After troubleshooting, click the \"Retry\" button."),
+    ErrorString([ "0300-4008" ], "The AMS failed to change filament."),
+    ErrorString([ "0700-8001", "0701-8001", "0702-8001", "0703-8001" ], "The AMS failed to change filament."),
+    ErrorString([ "0300-800B" ], "The cutter is stuck. Please make sure the cutter handle is out."),
+    ErrorString([ "1200-8001" ], "Cutting the filament failed. Please check to see if the cutter is stuck. Refer to the Assistant for solutions."),
+    ErrorString([ "0300-4006" ], "The nozzle is clogged."),
+    ErrorString([ "0300-8008" ], "Printing Stopped because nozzle temperature problem.")
+]
+
+def error_to_string(error):
+    for error_string in error_strings:
+        if error_string.matches(error):
+            return error_string.string
+    return f"Unknown error: {error}"
+
 def on_connect(client, userdata, flags, rc, properties):
     print(f"{userdata.name}: Connected with result code: {rc}")
 
@@ -25,6 +62,9 @@ def normalize_bambu_json(userdata, json):
     printing = json["print"]
     if "err" not in printing:
         printing["err"] = userdata.current_err
+    if len(printing["err"]) >= 8:
+        err = printing["err"]
+        printing["err"] = err[len(err) - 8 : len(err)-4] + "-" + err[len(err)-4:]
     if "gcode_state" not in printing:
         printing["gcode_state"] = userdata.current_state
     if "subtask_name" not in printing:
@@ -49,7 +89,11 @@ def bambu_on_message(client, userdata, msg):
         userdata.current_state = new_state
     if userdata.current_err != new_err:
         print(f"error transition: {userdata.current_err} => {new_err}")
-        email_server.publish(userdata.topic, f"ERORR in print: {response["print"]["subtask_name"]} (err {new_err})")
+        if new_err != "0":
+            if new_err in ignored_errors:
+                print("[error is ignored]")
+            else:
+                email_server.publish(userdata.topic, f"ERORR in print: {error_to_string(new_err)} (err {new_err})")
         userdata.current_err = new_err
 
 class EmailServerUserData:
