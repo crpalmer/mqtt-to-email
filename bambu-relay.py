@@ -21,6 +21,7 @@ class ErrorString:
 error_strings = [
     # Unknown errors that I've hit:
     ErrorString([ "0500-808C" ], "Could not identify build plate or invalid build plate was specified."),
+    ErrorString([ "07FF-8020" ], "Failed to change nozzles"),
 
     # From the Bambu Error List
     ErrorString([ "0300-800A" ], "A Filament pile-up was detected by the AI Print Monitoring. Please clean the filament from the waste chute."),
