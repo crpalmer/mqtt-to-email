@@ -63,7 +63,7 @@ def normalize_bambu_json(userdata, json):
     printing = json["print"]
     if "err" not in printing:
         printing["err"] = userdata.current_err
-    if len(printing["err"]) >= 8:
+    elif len(printing["err"]) >= 8:
         err = printing["err"]
         printing["err"] = err[len(err) - 8 : len(err)-4] + "-" + err[len(err)-4:]
     if "gcode_state" not in printing:
