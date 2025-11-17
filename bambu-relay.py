@@ -20,6 +20,7 @@ class ErrorString:
 
 error_strings = [
     # Unknown errors that I've hit:
+    ErrorString([ "0500-806E" ], "A foreign object on the build plate was detected."),
     ErrorString([ "0500-808C" ], "Could not identify build plate or invalid build plate was specified."),
     ErrorString([ "07FF-8020" ], "Failed to change nozzles"),
 
