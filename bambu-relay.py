@@ -23,6 +23,7 @@ error_strings = [
     ErrorString([ "0300-801E" ], "The extruder motor is overloaded."),
     ErrorString([ "0500-806E" ], "A foreign object on the build plate was detected."),
     ErrorString([ "0500-808C" ], "Could not identify build plate or invalid build plate was specified."),
+    ErrorString([ "0700-8011" ], "AMS reports filament ran out."),
     ErrorString([ "07FF-8020" ], "Failed to change nozzles"),
     ErrorString([ "0500-8051" ], "Build plate specified by the task is different than the detected build plate."),
 
