@@ -80,25 +80,31 @@ def normalize_bambu_json(userdata, json):
             printing["subtask_name"] = "<unknown>"
 
 def bambu_on_message(client, userdata, msg):
-    response = json.loads(msg.payload.decode('utf-8'))
+    try:
+        response = json.loads(msg.payload.decode('utf-8'))
 
-    normalize_bambu_json(userdata, response)
-    new_state = response["print"]["gcode_state"]
-    new_err = response["print"]["err"]
+        normalize_bambu_json(userdata, response)
+        new_state = response["print"]["gcode_state"]
+        new_err = response["print"]["err"]
 
-    if userdata.current_state != new_state:
-        print(f"state transition: {userdata.current_state} => {new_state}")
-        if new_state == "FINISH":
-            email_server.publish(userdata.topic, f"Print completed: {response["print"]["subtask_name"]}")
-        userdata.current_state = new_state
-    if userdata.current_err != new_err:
-        print(f"error transition: {userdata.current_err} => {new_err}")
-        if new_err != "0":
-            if new_err in ignored_errors:
-                print("[error is ignored]")
-            else:
-                email_server.publish(userdata.topic, f"ERORR in print: {error_to_string(new_err)} (err {new_err})")
-        userdata.current_err = new_err
+        if userdata.current_state != new_state:
+            print(f"state transition: {userdata.current_state} => {new_state}")
+            if new_state == "FINISH":
+                email_server.publish(userdata.topic, f"Print completed: {response["print"]["subtask_name"]}")
+            userdata.current_state = new_state
+        if userdata.current_err != new_err:
+            print(f"error transition: {userdata.current_err} => {new_err}")
+            if new_err != "0":
+                if new_err in ignored_errors:
+                    print("[error is ignored]")
+                else:
+                    email_server.publish(userdata.topic, f"ERORR in print: {error_to_string(new_err)} (err {new_err})")
+            userdata.current_err = new_err
+    except JSONDecodeError as error:
+        print(f"Failed to decode JSON: {error}")
+        print(msg.payload)
+    except Exception as error:
+        print(f"Exception ocurred: {error}")
 
 class EmailServerUserData:
     name = "email-server"
