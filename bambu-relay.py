@@ -20,9 +20,11 @@ class ErrorString:
 
 error_strings = [
     # Unknown errors that I've hit:
+    ErrorString([ "0300-801E" ], "The extruder motor is overloaded."),
     ErrorString([ "0500-806E" ], "A foreign object on the build plate was detected."),
     ErrorString([ "0500-808C" ], "Could not identify build plate or invalid build plate was specified."),
     ErrorString([ "07FF-8020" ], "Failed to change nozzles"),
+    ErrorString([ "0500-8051" ], "Build plate specified by the task is different than the detected build plate."),
 
     # From the Bambu Error List
     ErrorString([ "0300-800A" ], "A Filament pile-up was detected by the AI Print Monitoring. Please clean the filament from the waste chute."),
