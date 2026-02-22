@@ -1,0 +1,5 @@
+services:
+  mqtt-to-email:
+    image: mqtt-to-email
+    container_name: mqtt-to-email
+    restart: unless-stopped
