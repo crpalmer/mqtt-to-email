@@ -48,7 +48,7 @@ on_subscribe(struct mosquitto *mosq, void *obj, int mid, int qos_count, const in
 void
 on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg) {
     //FILE *pipe = popen("cat", "w");
-    FILE *pipe = popen("ssmtp -au crpalmer@gmail.com " EMAIL, "w");
+    FILE *pipe = popen("ssmtp " EMAIL, "w");
     if (! pipe) {
 	perror("popen");
 	exit(1);
@@ -57,7 +57,7 @@ on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *ms
     const char *channel = msg->topic;
     if (strlen(channel) >= strlen(TOPIC_PREFIX)) channel += strlen(TOPIC_PREFIX);
 
-    fprintf(pipe, "To: " EMAIL "\nFrom: crpalmer@gmail.com\nSubject: MQTT Alert (%s)\n\n%s", channel, (char *) msg->payload);
+    fprintf(pipe, "From: chris@crpalmer.org\nSubject: MQTT Alert (%s)\n\n%s", channel, (char *) msg->payload);
     fclose(pipe);
     printf("sent alert: %s\n", (char *) msg->payload);
 }
