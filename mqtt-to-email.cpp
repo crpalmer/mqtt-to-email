@@ -48,7 +48,7 @@ on_subscribe(struct mosquitto *mosq, void *obj, int mid, int qos_count, const in
 void
 on_message(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg) {
     //FILE *pipe = popen("cat", "w");
-    FILE *pipe = popen("ssmtp " EMAIL, "w");
+    FILE *pipe = popen("ssmtp -C ./ssmtp.conf " EMAIL, "w");
     if (! pipe) {
 	perror("popen");
 	exit(1);
