@@ -84,8 +84,9 @@ main(int argc, char *argv[]) {
     mosquitto_connect_callback_set(mosq, on_connect);
     mosquitto_subscribe_callback_set(mosq, on_subscribe);
     mosquitto_message_callback_set(mosq, on_message);
+    mosquitto_username_pw_set(mosq, "mqtt-to-email", "mqtt-to-email");
 
-    rc = mosquitto_connect(mosq, "mqtt.crpalmer.org", 1883, 60);
+    rc = mosquitto_connect(mosq, "192.168.1.16", 1883, 60);
     if (rc != MOSQ_ERR_SUCCESS) {
 	fprintf(stderr, "Error: %s\n", mosquitto_strerror(rc));
 	exit(1);
